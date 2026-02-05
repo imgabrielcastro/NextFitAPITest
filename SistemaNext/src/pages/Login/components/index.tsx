@@ -9,8 +9,33 @@ import TextLogin from "./TextLink";
 import IconLink from "./IconNavigate";
 import igIcon from "../../../assets/instaP.png";
 import ytIcon from "../../../assets/ytIcon.png";
+import { useState } from "react";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { schema } from "../../../schema/index";
 
 export default function Login() {
+  type LoginFormData = yup.InferType<typeof schema>;
+  type Step = "email" | "password";
+
+  const [step, setStep] = useState<Step>("email");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isEmailSubmitted, setIsEmailSubmitted] = useState(false);
+  const [isPassowordSubmitted, setIsPassowordSubmitted] = useState(false);
+
+  // const {
+  //   register,
+  //   formState: { errors, isSubmitting },
+  //   handleSubmit,
+  // } = useForm<LoginFormData>({
+  //   resolver: yupResolver(schema),
+  //   mode: "onSubmit",
+  // });
+
   return (
     <VStack
       sx={{
@@ -28,7 +53,7 @@ export default function Login() {
       >
         <VStack
           sx={{
-            maxWidth: 550,
+            minWidth: 550,
             margin: "0 auto",
             justifyContent: "space-between",
             height: "100%",
@@ -45,13 +70,22 @@ export default function Login() {
             }}
           />
 
-          <VStack gap={8}>
+          <VStack gap={2}>
             <Typography variant="h4" color="primary.main" fontWeight="bold">
-              Que bom ter você por aqui! 👋
+              {step == "email"
+                ? "Que bom ter você por aqui! 👋"
+                : "Boas-vindas novamente!"}
             </Typography>
-            <TitleWithInput />
+            {step == "email" && (
+              <Typography variant="h6" color="text.primary">
+                Acesse sua conta Next Fit inserindo seu e-mail abaixo:
+              </Typography>
+            )}
 
-            <ConfirmButton />
+            <VStack gap={8}>
+              <TitleWithInput step={step} setMail={setEmail} setPass={setPassword}/>
+              <ConfirmButton step={step} />
+            </VStack>
           </VStack>
 
           <VStack
@@ -77,11 +111,11 @@ export default function Login() {
               <HStack gap={1} sx={{ display: { xs: "none", md: "flex" } }}>
                 <IconLink
                   icon={igIcon}
-                  link="https://www.instagram.com/nextfitoficial/"
+                  link="https://www.instagram.com/nextfitsistema/"
                 />
                 <IconLink
                   icon={ytIcon}
-                  link="https://www.youtube.com/@nextfit"
+                  link="https://www.youtube.com/@nextfitsistema"
                 />
               </HStack>
             </HStack>
@@ -109,6 +143,7 @@ export default function Login() {
       </VStack>
       <Box
         sx={{
+          display: { xs: "none", md: "block" },
           flex: 1,
           backgroundImage: `url(${nfp})`,
           backgroundSize: "cover",
