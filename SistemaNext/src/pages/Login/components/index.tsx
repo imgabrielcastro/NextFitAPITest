@@ -10,105 +10,107 @@ import IconLink from "./IconNavigate";
 import igIcon from "../../../assets/instaP.png";
 import ytIcon from "../../../assets/ytIcon.png";
 import { useState } from "react";
-import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { schema } from "../../../schema/index";
+import { schema } from "../../../schema";
+import * as yup from "yup";
+import { EmailPreview } from "./EmailPreview";
+
+export type LoginFormData = yup.InferType<typeof schema>;
+type Step = "email" | "password";
 
 export default function Login() {
-  type LoginFormData = yup.InferType<typeof schema>;
-  type Step = "email" | "password";
-
   const [step, setStep] = useState<Step>("email");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [isEmailSubmitted, setIsEmailSubmitted] = useState(false);
-  const [isPassowordSubmitted, setIsPassowordSubmitted] = useState(false);
+  const [emailForPreview, setEmailForPreview] = useState("");
 
-  // const {
-  //   register,
-  //   formState: { errors, isSubmitting },
-  //   handleSubmit,
-  // } = useForm<LoginFormData>({
-  //   resolver: yupResolver(schema),
-  //   mode: "onSubmit",
-  // });
+  const {
+    control,
+    handleSubmit,
+    trigger,
+    watch,
+    getValues,
+    formState: { errors, isSubmitting }
+  } = useForm<LoginFormData>({
+    resolver: yupResolver(schema),
+    mode: "onSubmit",
+    defaultValues: {
+      email: "",
+      password: ""
+    }
+  });
+
+  const emailValue = watch("email");
+
+  const onSubmit = (data: LoginFormData) => {
+    console.log("Login payload:", data);
+  };
+
+  const handleNext = async () => {
+    if (step === "email") {
+      const isValid = await trigger("email");
+      if (isValid) {
+        setEmailForPreview(getValues("email"));
+        setStep("password");
+      }
+      return;
+    }
+
+    handleSubmit(onSubmit)();
+  };
 
   return (
-    <VStack
-      sx={{
-        flex: 1,
-        flexDirection: "row",
-        minHeight: "100vh",
-      }}
-    >
-      <VStack
-        sx={{
-          flex: 1,
-          minHeight: "100vh",
-          padding: 4,
-        }}
-      >
+    <VStack sx={{ flex: 1, flexDirection: "row", minHeight: "100vh" }}>
+      <VStack sx={{ flex: 1, minHeight: "100vh", padding: 4 }}>
         <VStack
           sx={{
             minWidth: 550,
             margin: "0 auto",
             justifyContent: "space-between",
-            height: "100%",
+            height: "100%"
           }}
         >
           <Box
             component="img"
             src={nfpLogo}
             alt="Logo"
-            sx={{
-              width: "200px",
-              height: "auto",
-              marginTop: 8,
-            }}
+            sx={{ width: 200, marginTop: 8 }}
           />
 
           <VStack gap={2}>
             <Typography variant="h4" color="primary.main" fontWeight="bold">
-              {step == "email"
+              {step === "email"
                 ? "Que bom ter você por aqui! 👋"
                 : "Boas-vindas novamente!"}
             </Typography>
-            {step == "email" && (
-              <Typography variant="h6" color="text.primary">
+
+            {step === "email" && (
+              <Typography variant="h6">
                 Acesse sua conta Next Fit inserindo seu e-mail abaixo:
               </Typography>
             )}
 
+            {step === "password" && (
+              <EmailPreview email={emailForPreview || emailValue} onBack={() => setStep("email")} />
+            )}
+
             <VStack gap={8}>
-              <TitleWithInput step={step} setMail={setEmail} setPass={setPassword}/>
-              <ConfirmButton step={step} />
+              <TitleWithInput step={step} control={control} errors={errors} />
+              <ConfirmButton
+                step={step}
+                loading={isSubmitting}
+                onClick={handleNext}
+              />
             </VStack>
           </VStack>
 
-          <VStack
-            sx={{
-              alignItems: { xs: "center", md: "stretch" },
-              textAlign: { xs: "center", md: "left" },
-            }}
-          >
-            <HStack
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{
-                flexDirection: { xs: "column", md: "row" },
-                alignItems: { xs: "flex-start", md: "center" },
-                gap: { xs: 1, md: 0 },
-              }}
-            >
+          <VStack>
+            <HStack justifyContent="space-between">
               <TextLogin
                 label="Acessar central de ajuda"
                 link="https://ajuda.nextfit.com.br/support/home"
               />
 
-              <HStack gap={1} sx={{ display: { xs: "none", md: "flex" } }}>
+              <HStack gap={1}>
                 <IconLink
                   icon={igIcon}
                   link="https://www.instagram.com/nextfitsistema/"
@@ -120,15 +122,7 @@ export default function Login() {
               </HStack>
             </HStack>
 
-            <HStack
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{
-                flexDirection: { xs: "column", md: "row" },
-                alignItems: { xs: "flex-start", md: "center" },
-                gap: { xs: 1, md: 0 },
-              }}
-            >
+            <HStack justifyContent="space-between">
               <TextLogin
                 label="Entre em contato com suporte"
                 link="https://api.whatsapp.com/send?phone=554830360419"
@@ -141,15 +135,16 @@ export default function Login() {
           </VStack>
         </VStack>
       </VStack>
+
       <Box
         sx={{
           display: { xs: "none", md: "block" },
           flex: 1,
           backgroundImage: `url(${nfp})`,
           backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundPosition: "center"
         }}
-      ></Box>
+      />
     </VStack>
   );
 }
