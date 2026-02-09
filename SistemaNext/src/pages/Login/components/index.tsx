@@ -15,11 +15,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { schema } from "../../../schema";
 import * as yup from "yup";
 import { EmailPreview } from "./EmailPreview";
+import { useNavigate } from "react-router-dom";
 
 export type LoginFormData = yup.InferType<typeof schema>;
 type Step = "email" | "password";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("email");
   const [emailForPreview, setEmailForPreview] = useState("");
 
@@ -29,33 +31,42 @@ export default function Login() {
     trigger,
     watch,
     getValues,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: yupResolver(schema),
     mode: "onSubmit",
     defaultValues: {
       email: "",
-      password: ""
-    }
+      password: "",
+    },
   });
 
   const emailValue = watch("email");
 
   const onSubmit = (data: LoginFormData) => {
     console.log("Login payload:", data);
+    navigate("/clientes");
   };
 
   const handleNext = async () => {
+    console.log("handleNext chamado, step atual:", step);
+
     if (step === "email") {
       const isValid = await trigger("email");
+      console.log("Validação email:", isValid);
       if (isValid) {
         setEmailForPreview(getValues("email"));
         setStep("password");
       }
       return;
+    } else {
+      const passwordValid = await trigger("password");
+      console.log("Validação senha:", passwordValid);
+      if (passwordValid) {
+        onSubmit(getValues());
+      }
+      return;
     }
-
-    handleSubmit(onSubmit)();
   };
 
   return (
@@ -66,7 +77,7 @@ export default function Login() {
             minWidth: 550,
             margin: "0 auto",
             justifyContent: "space-between",
-            height: "100%"
+            height: "100%",
           }}
         >
           <Box
@@ -84,13 +95,16 @@ export default function Login() {
             </Typography>
 
             {step === "email" && (
-              <Typography variant="h6">
+              <Typography variant="h6" color="text.secondary">
                 Acesse sua conta Next Fit inserindo seu e-mail abaixo:
               </Typography>
             )}
 
             {step === "password" && (
-              <EmailPreview email={emailForPreview || emailValue} onBack={() => setStep("email")} />
+              <EmailPreview
+                email={emailForPreview || emailValue}
+                onBack={() => setStep("email")}
+              />
             )}
 
             <VStack gap={8}>
@@ -104,7 +118,7 @@ export default function Login() {
           </VStack>
 
           <VStack>
-            <HStack justifyContent="space-between">
+            <HStack justifyContent="space-between" alignItems="center">
               <TextLogin
                 label="Acessar central de ajuda"
                 link="https://ajuda.nextfit.com.br/support/home"
@@ -122,7 +136,11 @@ export default function Login() {
               </HStack>
             </HStack>
 
-            <HStack justifyContent="space-between">
+            <HStack
+              justifyContent="space-between"
+              alignItems="center"
+              width="100%"
+            >
               <TextLogin
                 label="Entre em contato com suporte"
                 link="https://api.whatsapp.com/send?phone=554830360419"
@@ -142,7 +160,7 @@ export default function Login() {
           flex: 1,
           backgroundImage: `url(${nfp})`,
           backgroundSize: "cover",
-          backgroundPosition: "center"
+          backgroundPosition: "center",
         }}
       />
     </VStack>

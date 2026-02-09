@@ -8,13 +8,15 @@ interface Props {
 
 export function EmailPreview({ email, onBack }: Props) {
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-    }}>
-      <IconButton 
-        onClick={onBack} 
-        sx={{ 
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <IconButton
+        onClick={onBack}
+        sx={{
           color: "primary.main",
         }}
       >

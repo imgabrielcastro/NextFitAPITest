@@ -9,7 +9,6 @@ interface Props {
 }
 
 export default function TitleWithInput({ step, control, errors }: Props) {
-  
   if (step === "email") {
     return (
       <Controller
@@ -23,6 +22,7 @@ export default function TitleWithInput({ step, control, errors }: Props) {
             error={!!errors.email}
             helperText={errors.email?.message}
             fullWidth
+            variant="standard"
           />
         )}
       />
@@ -41,6 +41,7 @@ export default function TitleWithInput({ step, control, errors }: Props) {
           error={!!errors.password}
           helperText={errors.password?.message}
           fullWidth
+          variant="standard"
         />
       )}
     />
