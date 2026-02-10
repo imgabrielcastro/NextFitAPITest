@@ -55,6 +55,13 @@ export default function TableClients() {
           </TableHead>
 
           <TableBody>
+            {clientes.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={3} align="center" sx={{padding: 4}}>
+                  Nenhum cliente encontrado
+                </TableCell>
+              </TableRow>
+            )}
             {clientesPaginados.map((cliente) => (
               <TableRow
                 key={cliente.Id}
