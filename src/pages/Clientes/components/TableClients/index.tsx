@@ -9,11 +9,15 @@ import {
   Avatar,
   TablePagination,
   Skeleton,
+  Button,
+  Typography,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { getAlunos } from "../../../../services/alunosService";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { calcularIdade } from "../../../../utils/date";
 import ClienteDetailsModal from "../ClienteDetailsModal";
+import CadastroClienteModal from "../CadastroClienteModal";
 
 export default function TableClients() {
   const [clientes, setClientes] = useState<any[]>([]);
@@ -24,15 +28,19 @@ export default function TableClients() {
     null,
   );
   const [modalOpen, setModalOpen] = useState(false);
+  const [cadastroModalOpen, setCadastroModalOpen] = useState(false);
 
-  useEffect(() => {
+  const fetchClientes = useCallback(() => {
     setLoading(true);
-
     getAlunos(0, 1000).then((data) => {
       setClientes(data.Content ?? []);
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    fetchClientes();
+  }, [fetchClientes]);
 
   const clientesPaginados = clientes.slice(
     page * rowsPerPage,
@@ -41,6 +49,27 @@ export default function TableClients() {
 
   return (
     <Paper sx={{ py: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 2,
+          mb: 2,
+        }}
+      >
+        <Typography variant="h6" fontWeight={600}>
+          Clientes
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => setCadastroModalOpen(true)}
+        >
+          Novo Cliente
+        </Button>
+      </Box>
+
       <Box
         sx={{
           maxHeight: 720,
@@ -148,6 +177,12 @@ export default function TableClients() {
           setModalOpen(false);
           setSelectedClienteId(null);
         }}
+      />
+
+      <CadastroClienteModal
+        open={cadastroModalOpen}
+        onClose={() => setCadastroModalOpen(false)}
+        onSuccess={fetchClientes}
       />
     </Paper>
   );
