@@ -29,6 +29,46 @@ Frontend
 npm install
 npm run dev
 
+API Endpoints
+
+### Listar clientes
+```
+GET /api/clientes
+```
+
+### Buscar cliente por ID
+```
+GET /api/clientes/:id
+```
+
+### Cadastrar cliente
+```
+POST /api/clientes
+Content-Type: application/json
+```
+
+Exemplo de payload:
+```json
+{
+  "Nome": "João Silva",
+  "Email": "joao@email.com",
+  "Cpf": "12345678900",
+  "Rg": "1234567",
+  "Sexo": 1,
+  "DataNascimento": "1990-05-15T03:00:00.000Z",
+  "DddFone": "48",
+  "Fone": "999999999",
+  "NotificarWhatsApp": true,
+  "Cep": "88000000",
+  "Endereco": "Rua Principal",
+  "NumEndereco": "100",
+  "Bairro": "Centro",
+  "CodigoCidade": 4481,
+  "CodigoObjetivo": 81895,
+  "CodigoUsuarioConsultor": 15104057
+}
+```
+
 Observações
 
 O backend precisa estar rodando antes do frontend.

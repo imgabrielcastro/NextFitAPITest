@@ -1,4 +1,4 @@
-import { nextfitGet } from "../services/nextfit/nextfit.service.js";
+import { nextfitGet, nextfitPost } from "../services/nextfit/nextfit.service.js";
 
 export async function listarClientes(req, res) {
   try {
@@ -54,5 +54,54 @@ export async function buscarClientePorId(req, res) {
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: "Erro ao buscar cliente" });
+  }
+}
+
+export async function cadastrarCliente(req, res) {
+  try {
+    const {
+      Nome,
+      Email,
+      Cpf,
+      Rg,
+      Sexo,
+      DataNascimento,
+      DddFone,
+      Fone,
+      NotificarWhatsApp,
+      Cep,
+      Endereco,
+      NumEndereco,
+      Bairro,
+      CodigoCidade,
+      CodigoObjetivo,
+      CodigoUsuarioConsultor,
+    } = req.body;
+
+    const data = await nextfitPost("/api/v2/Cliente/Inserir", {
+      Nome,
+      Email,
+      Cpf,
+      Rg,
+      Sexo,
+      DataNascimento,
+      DddFone,
+      Fone,
+      NotificarWhatsApp: NotificarWhatsApp ?? true,
+      Cep,
+      Endereco,
+      NumEndereco,
+      Bairro,
+      CodigoCidade,
+      CodigoObjetivo,
+      CodigoUsuarioConsultor,
+    });
+
+    res.status(201).json(data);
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+    const status = err.response?.status || 500;
+    const message = err.response?.data?.Message || "Erro ao cadastrar cliente";
+    res.status(status).json({ message });
   }
 }
